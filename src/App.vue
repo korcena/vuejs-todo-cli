@@ -1,28 +1,58 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <h1>My To Do List</h1>
+    <EntryInput v-bind:todos="todos" />
+    <div class="status">Unfinished entries: {{unfinishedEntries.length}}</div>
+    <EntryItem v-bind:todos="todos"/>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import EntryInput from "./components/EntryInput.vue";
+import EntryItem from "./components/EntryItem.vue";
 
 export default {
-  name: 'app',
+  name: "app",
+  data: function() {
+    return {
+      todos: []
+    };
+  },
   components: {
-    HelloWorld
+    EntryInput,
+    EntryItem
+  }, 
+  computed: {
+    unfinishedEntries: function(){
+      return this.todos.filter(en => !en.isDone);
+    }
+  }, 
+  watch: {
+    todos: {
+      handler: function(newList){
+        sessionStorage.setItem('my-todo-list', JSON.stringify(newList));
+      }, 
+      deep: true
+    }
+  },
+  mounted: function(){
+    const data = sessionStorage.getItem('my-todo-list');
+    this.todos = data ? JSON.parse(data) : [];
   }
-}
+};
 </script>
 
 <style>
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+body > div {
+  width: 600px;
+  max-width: 90%;
+  margin: 0 auto;
+  font-family: Arial, Helvetica, sans-serif;
   text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+}
+
+.status {
+    text-align: left;
+    margin: 1rem 0;
 }
 </style>
